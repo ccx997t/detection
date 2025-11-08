@@ -74,20 +74,18 @@ def create_report(info: ReportInfo):
         report_id = "REP-" + uuid.uuid4().hex[:8].upper()
         print(f"✅ 创建任务报告编号: {report_id} ({info.project_name})")
 
-        # Step 1: 生成封面
-        if create_report_cover is None:
-            raise RuntimeError("create_report_cover 未正确导入")
 
 
-        # Step 1: 调用 report_embedder 生成封面
-        create_report_cover(CONFIG,info.dict())
 
-        # Step 2: 调用 get_data_for_sheet 采集数据并填表
+        # Step 1: 调用 get_data_for_sheet 采集数据并填表
         #run_data_fill_pipeline(report_id)
 
-        # Step 3: 调用 detection_report_gen 汇总生成最终报告
+        # Step 2: 调用 detection_report_gen 汇总生成最终报告
         generate_report(CONFIG)
-
+        if create_report_cover is None:
+            raise RuntimeError("create_report_cover 未正确导入")
+        # Step 3: 调用 report_embedder 生成封面
+        create_report_cover(CONFIG,info.dict())
 
         return {"code": 200, "message": "巡检报告生成成功", "data": {
             "report_id": report_id

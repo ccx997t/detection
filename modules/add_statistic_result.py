@@ -18,7 +18,7 @@ import io
 import sys
 import re
 import configparser
-
+from jinja2 import Environment, DebugUndefined
 # 全局参数
 TEMPLATE_PATH = ""
 INPUT_DIR = ""
@@ -48,9 +48,10 @@ def run_statistic_to_word():
 
     # ✅ 写入 Word 模板
     print(f"\n✅ 读取word报告：{output_path}")
+    jinja_env = Environment(undefined=DebugUndefined)
     doc = DocxTemplate(output_path)
     context = {"汇总结果": summary_text}
-    doc.render(context)
+    doc.render(context,jinja_env=jinja_env)
     doc.save(output_path)
     print(f"\n✅ 已生成报告：{output_path}")
 

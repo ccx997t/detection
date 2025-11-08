@@ -197,22 +197,22 @@ def clean_doc(doc: Document) -> Document:
 
 def create_report_cover(config : configparser.ConfigParser(), info: dict):
     """
-    生成巡检报告封面（基于 Word 模板）。
-    模板路径：template/巡检报告封面模板.docx
-    输出路径：out/{report_id}_封面.docx
+    生成巡检报告封面。
+    输出路径：out/实验性项目巡检报告.docx
     """
-    COVER_TEMPLATE_PATH=config.get("Path", "cover_path")
+    TEMPLATE_PATH =config.get("Path", "template_path")
+    basename = os.path.basename(TEMPLATE_PATH)
+    #print(f"basename = {basename}")
+    # 去掉文件名中的“模板”，构成输出文件名。
+    new_name = re.sub(r"模板\(.*?\)", "", basename).replace(".docx", "")
+    #print(f"new_name = {new_name}")
+    new_name = new_name.strip("-_ ") + ".docx"
+    #print(f"new_name = {new_name}")
+    # 构成输出文件全路径。
     OUTPUT_DIR = config.get("Path", "output_dir")
-    cover_path=os.path.join(PROJECT_ROOT, COVER_TEMPLATE_PATH)
-
-    # 生成输出文件路径
-    project_name = info.get("project_name", "unknown_project")
-    output_path = os.path.join(PROJECT_ROOT,OUTPUT_DIR, f"cover_{project_name}.docx")
-
-    if not os.path.exists(cover_path):
-        raise FileNotFoundError(f"未找到封面模板：{COVER_TEMPLATE_PATH}")
-
-    log.info(f"📄 正在生成封面：{COVER_TEMPLATE_PATH}")
+    log.info(f"📄 OUTPUT_DIR：{OUTPUT_DIR}")
+    output_path = os.path.join(OUTPUT_DIR, new_name)
+    log.info(f"📄 正在生成封面：{output_path}")
     # 填充模板上下文
     context = {
         "项目名称": info.get("project_name", ""),
@@ -223,7 +223,7 @@ def create_report_cover(config : configparser.ConfigParser(), info: dict):
         "责任人": info.get("report_person", ""),
     }
     jinja_env = Environment(undefined=DebugUndefined)
-    doc = DocxTemplate(cover_path)
+    doc = DocxTemplate(output_path)
     doc.render(context, jinja_env=jinja_env)
     doc.save(output_path)
     log.info(f"✅ 封面生成成功：{output_path}")

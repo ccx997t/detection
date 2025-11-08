@@ -22,6 +22,7 @@ import os                                  # 提供文件和路径操作函数
 import sys                                 # 提供系统级访问，如路径与退出
 import configparser                        # 配置解释器。
 import subprocess
+import uvicorn
 # ========== 修正项目模块搜索路径 ==========
 # 本文件位于 detection/modules/ 或 detection 根目录下
 # PROJECT_ROOT 指向项目的根目录，以便导入 modules 下的自定义模块
@@ -70,6 +71,12 @@ except Exception as e:
     _report_embedder = None
     print(f"⚠️  未找到 update_dic_uno 模块：{e}")
 
+# 服务模块：提供UI 与 数据库的服务中间件
+try:
+    from modules import server_detection as _server
+except Exception as e:
+    _server = None
+    print(f"⚠️  未找到 server_detection 模块：{e}")
 # 创建日志记录器实例
 log = _ut.Logger()
 
@@ -139,7 +146,13 @@ def main():
     # ---------- 执行操作 ----------
     # 获取服务器配置。
     server_run = CONFIG.get("ServerConf", "server")
-    generate_report(CONFIG)
+    if server_run == "run":
+        # 执行服务。
+        _server.run(CONFIG)
+    else:
+        # 生成巡检报告。
+        generate_report(CONFIG)
+
 # ============================================================
 # 程序启动入口
 # ============================================================
