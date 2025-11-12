@@ -84,6 +84,9 @@ def adjust_excel() -> str:
     try:
         # PDFS_DIR目录默认是"tmp/pdfs", 调整后的临时文件保存在"tmp/"目录下。
         tmp_dir = os.path.dirname(os.path.abspath(PDFS_DIR))
+
+        os.makedirs(tmp_dir, exist_ok=True)
+
         # 删除临时目录下的文件。
         _ut.remove_path_recursio_files_func(tmp_dir)        
 
